@@ -1,7 +1,7 @@
 ---
 title: "HTB — Timelapse Writeup"
 date: 2026-05-23 00:00:00 +0000
-categories: [HackTheBox, Writeup]
+categories: [boxes]
 tags: [windows, active-directory, winrm, laps, certificate, privilege-escalation]
 image: /assets/img/box/22/logo.png
 ---
