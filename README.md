@@ -1,85 +1,80 @@
-<!-- markdownlint-disable-next-line -->
-<div align="center">
+# Security portfolio
 
-  <!-- markdownlint-disable-next-line -->
-  # Chirpy Jekyll Theme
+An Astro static site for writeups, research, blog posts, and projects. The current entries are clearly marked **SAMPLE** and the personal fields are `TODO(owner)` placeholders.
 
-  A minimal, responsive, and feature-rich Jekyll theme for technical writing.
+## Run locally
 
-  [![CI](https://img.shields.io/github/actions/workflow/status/cotes2020/jekyll-theme-chirpy/ci.yml?logo=github)][ci]&nbsp;
-  [![Codacy Badge](https://img.shields.io/codacy/grade/4e556876a3c54d5e8f2d2857c4f43894?logo=codacy)][codacy]&nbsp;
-  [![GitHub license](https://img.shields.io/github/license/cotes2020/jekyll-theme-chirpy?color=goldenrod)][license]&nbsp;
-  [![Gem Version](https://img.shields.io/gem/v/jekyll-theme-chirpy?&logo=RubyGems&logoColor=ghostwhite&label=gem&color=orange)][gem]&nbsp;
-  [![Open in Dev Containers](https://img.shields.io/badge/Dev_Containers-Open-deepskyblue?logo=linuxcontainers)][open-container]
+Requires Node.js 22 or newer.
 
-  [**Live Demo** →][demo]
+```sh
+npm install
+npm run dev
+```
 
-  [![Devices Mockup](https://chirpy-img.netlify.app/commons/devices-mockup.png)][demo]
+Open the local URL printed by Astro. To check the production output:
 
-</div>
+```sh
+npm run check
+npm run build
+npm test
+npm run preview
+```
 
-## Features
+The build runs Astro and then Pagefind. **Search works in the production preview or deployed site after a build**; `npm run dev` does not generate the Pagefind index.
 
-- Dark Theme
-- Localized UI language
-- Pinned Posts on Home Page
-- Hierarchical Categories
-- Trending Tags
-- Table of Contents
-- Last Modified Date
-- Syntax Highlighting
-- Mathematical Expressions
-- Mermaid Diagrams & Flowcharts
-- Dark Mode Images
-- Embed Media
-- Comment Systems
-- Built-in Search
-- Atom Feeds
-- PWA
-- Web Analytics
-- SEO & Performance Optimization
+Search covers **post titles and tags only**. Markdown prose, headings, code, summaries, and screenshots are not indexed.
 
-## Documentation
+## Add a post
 
-To learn how to use, develop, and upgrade the project, please refer to the [Wiki][wiki].
+Create `src/content/posts/writeups/my-box/index.md` with this frontmatter and freeform Markdown below it:
 
-## Contributing
+```md
+---
+title: "My retired box"
+date: 2026-10-03
+type: writeup
+summary: "A one-line summary."
+tags: ["active-directory", "kerberos"]
+difficulty: medium
+---
 
-Contributions (_pull requests_, _issues_, and _discussions_) are what make the open-source community such an amazing place
-to learn, inspire, and create. Any contributions you make are greatly appreciated.
-For details, see the "[Contributing Guidelines][contribute-guide]".
+Your post starts here.
+```
 
-## Credits
+For a research post, use `src/content/posts/research/my-topic/index.md` and `type: research`. For a blog post that explains or reviews a tool, use `src/content/posts/blog/my-topic/index.md` and `type: tool`. Tools you built belong in Projects. The required fields are `title`, `date`, `type`, `summary`, `tags`, and `difficulty`; difficulty must be `easy`, `medium`, or `hard`. Tags must be lowercase kebab-case. The folder name becomes the URL slug, and the `type` must match its folder.
 
-### Contributors
+Put images in an `images/` folder beside that `index.md` and link with `![Meaningful alt text](./images/example.png)`. `draft: true` keeps an unfinished post out of listings and routes. Only publish writeups for retired HackTheBox machines and only publish findings that are cleared for disclosure. Remove or replace the clearly labeled SAMPLE entries before publishing real work.
 
-Thanks to [all the contributors][contributors] involved in the development of the project!
+## Add a project
 
-[![all-contributors](https://contrib.rocks/image?repo=cotes2020/jekyll-theme-chirpy&columns=16)][contributors]
-<sub> — Made with [contrib.rocks](https://contrib.rocks)</sub>
+Create a Markdown file such as `src/content/projects/my-project.md`:
 
-### Third-Party Assets
+```md
+---
+name: "My public project"
+description: "What it does in one sentence."
+tech: ["Astro", "TypeScript"]
+repo: "https://github.com/your-name/your-repo"
+status: "Maintained"
+---
+```
 
-This project is built on the [Jekyll][jekyllrb] ecosystem and some [great libraries][lib], and is developed using [VS Code][vscode] as well as tools provided by [JetBrains][jetbrains] under a non-commercial open-source software license.
+The repository URL is optional. Confirm a project is public before adding it. The site currently shows only SAMPLE project placeholders.
 
-The avatar and favicon for the project's website are from [ClipartMAX][clipartmax].
+## Post reading features
 
-## License
+Astro highlights fenced code blocks with Shiki. Each block has a keyboard-accessible copy button that shows confirmation. Article images open in a dialog by click, Enter, or Space; Escape, the close button, and a click outside the image dismiss it. Give every Markdown image meaningful alt text.
 
-This project is published under [MIT License][license].
+## Deployment
 
-[gem]: https://rubygems.org/gems/jekyll-theme-chirpy
-[ci]: https://github.com/cotes2020/jekyll-theme-chirpy/actions/workflows/ci.yml?query=event%3Apush+branch%3Amaster
-[codacy]: https://app.codacy.com/gh/cotes2020/jekyll-theme-chirpy/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade
-[license]: https://github.com/cotes2020/jekyll-theme-chirpy/blob/master/LICENSE
-[open-container]: https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/cotes2020/jekyll-theme-chirpy
-[jekyllrb]: https://jekyllrb.com/
-[clipartmax]: https://www.clipartmax.com/middle/m2i8b1m2K9Z5m2K9_ant-clipart-childrens-ant-cute/
-[demo]: https://cotes2020.github.io/chirpy-demo/
-[wiki]: https://github.com/cotes2020/jekyll-theme-chirpy/wiki
-[contribute-guide]: https://github.com/cotes2020/jekyll-theme-chirpy/blob/master/docs/CONTRIBUTING.md
-[contributors]: https://github.com/cotes2020/jekyll-theme-chirpy/graphs/contributors
-[lib]: https://github.com/cotes2020/chirpy-static-assets
-[vscode]: https://code.visualstudio.com/
-[jetbrains]: https://www.jetbrains.com/?from=jekyll-theme-chirpy
+The workflow at `.github/workflows/deploy.yml` builds and deploys on every push to `main`. This project is in the existing `sbouabid-sec/sbouabid-sec.github.io` repository. The production URL is `https://sbouabid-sec.github.io`. Before the first deployment, confirm GitHub Pages uses **GitHub Actions** as its source. The workflow derives the site URL from the repository owner. A custom domain can be configured later. No deployment has been performed during launch preparation.
 
+Every page has a canonical URL, description, and Open Graph metadata. The build produces `sitemap.xml` and `robots.txt`. Replace `public/og-placeholder.png` with an owner-provided image before publishing final content; its editable SVG source is beside it.
+
+## Owner details to supply
+
+Replace the `TODO(owner)` placeholders for the name, one-line status, bio, proof points, public email, GitHub/HackTheBox/LinkedIn URLs, public project choices and details, default Open Graph image, and final tag vocabulary. Replace SAMPLE posts with the owner's cleared, publishable work. The approved V5 design is already implemented. The light/dark choice is saved in browser local storage; a first visit always starts dark.
+
+## Dependency audit
+
+Astro 7.3.5 currently pulls in `http-cache-semantics` 4.2.0, which has an unresolved high-severity advisory ([GHSA-ch52-4w7c-c8xp](https://github.com/advisories/GHSA-ch52-4w7c-c8xp)). No patched version is published. The current site builds static files for GitHub Pages and does not ship this dependency to browsers; Astro uses it during remote-image handling. Recheck `npm audit --omit=dev` and upgrade when an Astro-compatible fix is available. Do not use `npm audit fix --force` without reviewing the dependency changes.

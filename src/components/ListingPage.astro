@@ -1,0 +1,72 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import PostRow from './PostRow.astro';
+
+interface Props {
+  eyebrow: string;
+  title: string;
+  intro: string;
+  posts: CollectionEntry<'posts'>[];
+}
+const { eyebrow, title, intro, posts } = Astro.props;
+const tags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
+---
+
+<section class="listing-header container">
+  <p class="eyebrow">{eyebrow}</p>
+  <h1>{title}</h1>
+  <p class="lede">{intro}</p>
+</section>
+<section class="filter-band" aria-label="Filter posts">
+  <div class="container filters" data-filters>
+    <label>Tag
+      <select name="tag" aria-label="Filter by tag">
+        <option value="">All tags</option>
+        {tags.map((tag) => <option value={tag}>{tag}</option>)}
+      </select>
+    </label>
+    <label>Difficulty
+      <select name="difficulty" aria-label="Filter by difficulty">
+        <option value="">All difficulties</option>
+        <option value="easy">Easy</option><option value="medium">Medium</option><option value="hard">Hard</option>
+      </select>
+    </label>
+  </div>
+</section>
+<section class="container listing-results" aria-label={`${eyebrow} posts`}>
+  <div class="list-caption"><span>NEWEST FIRST / SAMPLE CONTENT</span><span data-result-count>{posts.length} RESULTS</span></div>
+  <div class="post-list" data-post-list>{posts.map((post) => <PostRow post={post} />)}</div>
+  <p class="empty-results" hidden data-empty>No posts match those filters.</p>
+</section>
+
+<script>
+  const controls = document.querySelector<HTMLElement>('[data-filters]');
+  const tag = controls?.querySelector<HTMLSelectElement>('[name="tag"]');
+  const difficulty = controls?.querySelector<HTMLSelectElement>('[name="difficulty"]');
+  const rows = [...document.querySelectorAll<HTMLElement>('.post-row')];
+  const count = document.querySelector<HTMLElement>('[data-result-count]');
+  const empty = document.querySelector<HTMLElement>('[data-empty]');
+  const query = new URLSearchParams(location.search);
+  if (tag && [...tag.options].some((option) => option.value === query.get('tag'))) tag.value = query.get('tag') || '';
+  if (difficulty && [...difficulty.options].some((option) => option.value === query.get('difficulty'))) difficulty.value = query.get('difficulty') || '';
+
+  function applyFilters() {
+    let visible = 0;
+    for (const row of rows) {
+      const matchesTag = !tag?.value || row.dataset.tags?.split(' ').includes(tag.value);
+      const matchesDifficulty = !difficulty?.value || row.dataset.difficulty === difficulty.value;
+      row.hidden = !(matchesTag && matchesDifficulty);
+      if (!row.hidden) visible++;
+    }
+    if (count) count.textContent = `${visible} ${visible === 1 ? 'RESULT' : 'RESULTS'}`;
+    if (empty) empty.hidden = visible !== 0;
+  }
+  applyFilters();
+  for (const select of [tag, difficulty]) select?.addEventListener('change', () => {
+    const params = new URLSearchParams();
+    if (tag?.value) params.set('tag', tag.value);
+    if (difficulty?.value) params.set('difficulty', difficulty.value);
+    history.replaceState(null, '', `${location.pathname}${params.size ? `?${params}` : ''}`);
+    applyFilters();
+  });
+</script>

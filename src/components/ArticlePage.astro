@@ -1,0 +1,100 @@
+---
+import { render, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { sectionForType } from '../lib/posts.mjs';
+
+interface Props { post: CollectionEntry<'posts'>; }
+const { post } = Astro.props;
+const { Content, headings } = await render(post);
+const section = sectionForType(post.data.type);
+const sectionLabel = post.data.type === 'tool' ? 'BLOG' : post.data.type.toUpperCase();
+const date = post.data.date.toISOString().slice(0, 10);
+---
+
+<BaseLayout title={`${post.data.title} | TODO(owner): NAME`} description={post.data.summary} pageType="article" tone={post.data.type === 'tool' ? 'editorial' : 'dark'}>
+  <div class="sr-only" data-pagefind-body><span data-pagefind-meta="title">{post.data.title}</span> <span>{post.data.tags.join(' ')}</span></div>
+  <header class="article-header">
+    <div class="container">
+      <a class="eyebrow" href={`/${section}/`}>← {sectionLabel} / SAMPLE CONTENT</a>
+      <h1>{post.data.title}</h1>
+      <p class="lede">{post.data.summary}</p>
+      <div class="article-meta">
+        <time datetime={date}>{date}</time>
+        <span class:list={['difficulty', post.data.difficulty]}>{post.data.difficulty}</span>
+        <div class="tag-list">{post.data.tags.map((tag) => <span class="tag">{tag}</span>)}</div>
+      </div>
+    </div>
+  </header>
+  <div class="article-grid container">
+    <aside class="article-toc" aria-label="On this page">
+      <p>IN THIS ARTICLE</p>
+      {headings.filter((heading) => heading.depth === 2).map((heading) => <a href={`#${heading.slug}`}>{heading.text}</a>)}
+    </aside>
+    <article class="prose" data-pagefind-ignore="all">
+      <Content />
+      <div class="article-end"><a href={`/${section}/`}>← BACK TO {sectionLabel}</a></div>
+    </article>
+  </div>
+  <dialog class="image-lightbox" aria-label="Expanded article image">
+    <button type="button" class="lightbox-close chip" aria-label="Close expanded image">CLOSE ×</button>
+    <img alt="" />
+    <p class="lightbox-caption"></p>
+  </dialog>
+  <script>
+    // Markdown code and images are enhanced after Astro renders them.
+    for (const pre of document.querySelectorAll<HTMLPreElement>('.prose pre')) {
+      const frame = document.createElement('div');
+      frame.className = 'code-frame';
+      pre.parentNode?.insertBefore(frame, pre);
+      frame.append(pre);
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'copy-code chip';
+      button.textContent = 'COPY';
+      button.setAttribute('aria-label', 'Copy code to clipboard');
+      frame.append(button);
+      button.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(pre.querySelector('code')?.innerText ?? pre.innerText);
+          button.textContent = 'COPIED';
+          button.setAttribute('aria-label', 'Code copied to clipboard');
+          window.setTimeout(() => {
+            button.textContent = 'COPY';
+            button.setAttribute('aria-label', 'Copy code to clipboard');
+          }, 2200);
+        } catch {
+          button.textContent = 'COPY FAILED';
+          button.setAttribute('aria-label', 'Could not copy code');
+        }
+      });
+    }
+
+    const lightbox = document.querySelector<HTMLDialogElement>('.image-lightbox');
+    const expanded = lightbox?.querySelector<HTMLImageElement>('img');
+    const caption = lightbox?.querySelector<HTMLElement>('.lightbox-caption');
+    const close = lightbox?.querySelector<HTMLButtonElement>('.lightbox-close');
+    let opener: HTMLButtonElement | null = null;
+    for (const img of document.querySelectorAll<HTMLImageElement>('.prose img')) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'image-zoom';
+      button.setAttribute('aria-label', `Enlarge image: ${img.alt || 'article image'}`);
+      img.parentNode?.insertBefore(button, img);
+      button.append(img);
+      button.addEventListener('click', () => {
+        if (!lightbox || !expanded || !caption) return;
+        opener = button;
+        expanded.src = img.currentSrc || img.src;
+        expanded.alt = img.alt;
+        caption.textContent = img.alt;
+        lightbox.showModal();
+        close?.focus();
+      });
+    }
+    close?.addEventListener('click', () => lightbox?.close());
+    lightbox?.addEventListener('click', (event) => {
+      if (event.target === lightbox) lightbox.close();
+    });
+    lightbox?.addEventListener('close', () => opener?.focus());
+  </script>
+</BaseLayout>

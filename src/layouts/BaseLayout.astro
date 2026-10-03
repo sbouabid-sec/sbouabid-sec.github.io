@@ -1,0 +1,51 @@
+---
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import SearchDialog from '../components/SearchDialog.astro';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  tone?: 'dark' | 'editorial';
+  pageType?: 'website' | 'article';
+  image?: string;
+}
+
+const { title, description = 'TODO(owner): Portfolio description', tone = 'dark', pageType = 'website', image = '/og-placeholder.png' } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
+const socialImage = new URL(image, Astro.site ?? Astro.url).href;
+---
+
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="sitemap" href="/sitemap.xml" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={pageType} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={socialImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="TODO(owner): Replace the Open Graph placeholder image" />
+    <script is:inline>
+      try {
+        const saved = localStorage.getItem('theme');
+        if (saved === 'light') document.documentElement.dataset.theme = 'light';
+      } catch (_) { /* Storage can be unavailable; dark stays the default. */ }
+    </script>
+  </head>
+  <body class:list={['site', tone === 'editorial' && 'editorial']}>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Nav />
+    <main id="main"><slot /></main>
+    <Footer />
+    <SearchDialog />
+  </body>
+</html>

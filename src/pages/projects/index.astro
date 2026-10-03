@@ -1,0 +1,15 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+const projects = await getCollection('projects');
+---
+<BaseLayout title="Projects | TODO(owner): NAME" description="Projects built and maintained by TODO(owner): NAME. Current cards are SAMPLE placeholders pending public-project approval." tone="editorial">
+  <header class="page-heading container"><p class="eyebrow">04 / BUILT WORK</p><h1>Projects</h1><p class="lede">SAMPLE placeholders. TODO(owner): Confirm which projects can be public before publishing descriptions or repository links.</p></header>
+  <section class="container projects-list" aria-label="Projects">
+    {projects.map((project, index) => <article class="project-card">
+      <span class="row-index">{String(index + 1).padStart(2, '0')} / {project.data.sample ? 'SAMPLE' : project.data.status}</span>
+      <div><h2>{project.data.name}</h2><p>{project.data.description}</p><span class="eyebrow">{project.data.status}</span><div class="tag-list">{project.data.tech.map((item) => <span class="tag">{item}</span>)}</div>{project.data.repo && <a href={project.data.repo}>VIEW REPOSITORY ↗</a>}</div>
+      <span class="arrow" aria-hidden="true">↗</span>
+    </article>)}
+  </section>
+</BaseLayout>

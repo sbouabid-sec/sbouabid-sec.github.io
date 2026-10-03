@@ -1,0 +1,68 @@
+<dialog id="site-search" class="search-dialog" aria-label="Search posts">
+  <div class="search-dialog-heading">
+    <span class="eyebrow">SEARCH / POSTS</span>
+    <button class="chip search-close" type="button" aria-label="Close search">CLOSE ×</button>
+  </div>
+  <label for="post-search">Search titles and tags</label>
+  <input id="post-search" type="search" autocomplete="off" placeholder="Try Forest or kerberos" />
+  <p class="search-status" role="status" aria-live="polite">Type a title or tag to search.</p>
+  <ul class="search-results" aria-label="Search results"></ul>
+</dialog>
+
+<script is:inline>
+  const dialog = document.querySelector('#site-search');
+  const open = document.querySelector('.search-toggle');
+  const close = dialog?.querySelector('.search-close');
+  const input = dialog?.querySelector('#post-search');
+  const status = dialog?.querySelector('.search-status');
+  const list = dialog?.querySelector('.search-results');
+  let pagefind;
+  let request = 0;
+  let timer;
+
+  open?.addEventListener('click', () => {
+    dialog?.showModal();
+    input?.focus();
+  });
+  close?.addEventListener('click', () => dialog?.close());
+  dialog?.addEventListener('close', () => open?.focus());
+  dialog?.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      dialog.close();
+    }
+  });
+
+  input?.addEventListener('input', () => {
+    window.clearTimeout(timer);
+    const term = input.value.trim();
+    const current = ++request;
+    list?.replaceChildren();
+    if (!term) {
+      if (status) status.textContent = 'Type a title or tag to search.';
+      return;
+    }
+    if (status) status.textContent = 'Searching…';
+    timer = window.setTimeout(async () => {
+      try {
+        if (!pagefind) {
+          pagefind = await import('/pagefind/pagefind.js');
+        }
+        const found = await pagefind.search(term);
+        const results = await Promise.all(found.results.slice(0, 12).map((result) => result.data()));
+        if (current !== request) return;
+        for (const result of results) {
+          const item = document.createElement('li');
+          const link = document.createElement('a');
+          link.href = result.url;
+          link.textContent = result.meta.title || result.url;
+          item.append(link);
+          list?.append(item);
+        }
+        if (status) status.textContent = `${found.results.length} ${found.results.length === 1 ? 'result' : 'results'} for “${term}”.`;
+      } catch {
+        if (status) status.textContent = 'Search is available after npm run build and npm run preview.';
+      }
+    }, 150);
+  });
+</script>

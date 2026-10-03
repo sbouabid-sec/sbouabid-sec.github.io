@@ -1,0 +1,21 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { postUrl } from '../lib/posts.mjs';
+
+interface Props { post: CollectionEntry<'posts'>; }
+const { post } = Astro.props;
+const date = post.data.date.toISOString().slice(0, 10);
+---
+
+<article class="post-row" data-tags={post.data.tags.join(' ')} data-difficulty={post.data.difficulty}>
+  <span class="row-index">{post.data.type === 'tool' ? 'BLOG' : post.data.type.toUpperCase()}</span>
+  <div class="post-row-copy">
+    <h2><a href={postUrl(post)}>{post.data.title}</a></h2>
+    <p>{post.data.summary}</p>
+  </div>
+  <div class="post-row-side">
+    <time datetime={date}>{date}</time>
+    <span class:list={['difficulty', post.data.difficulty]}>{post.data.difficulty}</span>
+    <div class="tag-list">{post.data.tags.map((tag) => <span class="tag">{tag}</span>)}</div>
+  </div>
+</article>

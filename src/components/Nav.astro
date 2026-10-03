@@ -1,0 +1,60 @@
+---
+const current = Astro.url.pathname;
+const links = [
+  ['Home', '/'], ['Writeups', '/writeups/'], ['Research', '/research/'],
+  ['Blog', '/blog/'], ['Projects', '/projects/'],
+];
+---
+
+<header class="site-header">
+  <div class="nav-inner">
+    <a class="brand" href="/" aria-label="Home"><strong>S/</strong><span>TODO(owner): NAME</span></a>
+    <div class="nav-actions">
+      <button class="mobile-menu-button chip" type="button" aria-controls="primary-nav" aria-expanded="false">MENU</button>
+      <nav id="primary-nav" class="primary-nav" aria-label="Primary">
+        {links.map(([label, href]) => <a href={href} aria-current={current === href || (href !== '/' && current.startsWith(href)) ? 'page' : undefined}>{label}</a>)}
+        <a class="contact-nav" href="mailto:" aria-label="Contact by email; TODO(owner): public email address">Contact</a>
+      </nav>
+      <button class="search-toggle chip" type="button" aria-haspopup="dialog">SEARCH</button>
+      <button class="theme-toggle chip" type="button" aria-label="Switch to light theme">DARK</button>
+    </div>
+  </div>
+</header>
+
+<script>
+  const root = document.documentElement;
+  const toggle = document.querySelector<HTMLButtonElement>('.theme-toggle');
+  const menu = document.querySelector<HTMLButtonElement>('.mobile-menu-button');
+  const nav = document.querySelector<HTMLElement>('.primary-nav');
+
+  function updateThemeLabel() {
+    if (!toggle) return;
+    const dark = root.dataset.theme !== 'light';
+    toggle.textContent = dark ? 'DARK' : 'LIGHT';
+    toggle.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+  }
+  updateThemeLabel();
+
+  toggle?.addEventListener('click', () => {
+    const next = root.dataset.theme === 'light' ? 'dark' : 'light';
+    root.dataset.theme = next;
+    try { localStorage.setItem('theme', next); } catch (_) { /* Theme still changes for this visit. */ }
+    updateThemeLabel();
+  });
+
+  function setMenuOpen(open: boolean) {
+    if (!menu) return;
+    menu.setAttribute('aria-expanded', String(open));
+    menu.textContent = open ? 'CLOSE' : 'MENU';
+    nav?.classList.toggle('open', open);
+  }
+  menu?.addEventListener('click', () => {
+    setMenuOpen(menu.getAttribute('aria-expanded') !== 'true');
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && menu?.getAttribute('aria-expanded') === 'true' && !document.querySelector('dialog[open]')) {
+      setMenuOpen(false);
+      menu.focus();
+    }
+  });
+</script>

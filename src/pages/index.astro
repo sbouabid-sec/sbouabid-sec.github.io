@@ -1,0 +1,66 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostRow from '../components/PostRow.astro';
+import { publishedPosts } from '../lib/content';
+const latest = (await publishedPosts()).slice(0, 5);
+const sections = [
+  ['01', 'Writeups', '/writeups/', 'Walkthroughs and learning notes'],
+  ['02', 'Research', '/research/', 'Security investigations and reports'],
+  ['03', 'Blog', '/blog/', 'Tools, methods, and other writing'],
+  ['04', 'Projects', '/projects/', 'Things built and maintained'],
+];
+---
+
+<BaseLayout title="TODO(owner): NAME — Security Portfolio" description="Portfolio of TODO(owner): NAME, a student and junior penetration tester. Explore writeups, research, blog posts, and projects.">
+  <section class="hero container">
+    <div>
+      <p class="eyebrow">PORTFOLIO / OFFENSIVE SECURITY</p>
+      <h1>TODO(owner):<br /><span class="accent">NAME.</span></h1>
+      <p class="role">Student / Junior penetration tester</p>
+      <p class="status">TODO(owner): Add a one-line current status in your own words.</p>
+    </div>
+    <div class="hero-aside">
+      <span class="eyebrow">THE 30-SECOND SCAN</span>
+      <p>Writeups. Research. Tools. A place to show the work behind the learning.</p>
+    </div>
+  </section>
+
+  <section class="section-block container" aria-labelledby="about-heading">
+    <div class="section-heading"><h2 id="about-heading">About</h2><span>01 / INTRODUCTION</span></div>
+    <div class="about-grid">
+      <p>TODO(owner): Who are you, and what do you do?</p>
+      <p class="about-notes">TODO(owner): Describe what you do in life and what you have found. Keep this short and factual.</p>
+    </div>
+  </section>
+
+  <section class="proof-band" aria-labelledby="proof-heading">
+    <div class="container">
+      <div class="section-heading"><h2 id="proof-heading">Proof points</h2><span>02 / VERIFIED FACTS</span></div>
+      <div class="proof-grid">
+        <div class="proof-item"><span class="eyebrow">HACKTHEBOX</span><strong>TODO(owner): rank</strong><p>Provide your current, verifiable rank.</p></div>
+        <div class="proof-item"><span class="eyebrow">CERTIFICATION</span><strong>TODO(owner): status</strong><p>Provide a certification and its actual status.</p></div>
+        <div class="proof-item"><span class="eyebrow">FINDINGS</span><strong>TODO(owner): result</strong><p>Provide a public CVE or bounty result, if any.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-block container" aria-labelledby="links-heading">
+    <div class="section-heading"><h2 id="links-heading">Find me</h2><span>03 / LINKS</span></div>
+    <div class="link-grid">
+      <a href="#links-heading" aria-label="TODO(owner): GitHub profile URL"><strong><i class="link-icon" aria-hidden="true">&#123;&#125;</i> GitHub</strong><span>TODO(owner): URL <b class="arrow">↗</b></span></a>
+      <a href="#links-heading" aria-label="TODO(owner): HackTheBox profile URL"><strong><i class="link-icon" aria-hidden="true">⬡</i> HackTheBox</strong><span>TODO(owner): URL <b class="arrow">↗</b></span></a>
+      <a href="#links-heading" aria-label="TODO(owner): LinkedIn profile URL"><strong><i class="link-icon" aria-hidden="true">in</i> LinkedIn</strong><span>TODO(owner): URL <b class="arrow">↗</b></span></a>
+      <a href="mailto:" aria-label="Contact me by email; TODO(owner): public email address"><strong><i class="link-icon" aria-hidden="true">@</i> Contact me</strong><span>TODO(owner): email <b class="arrow">↗</b></span></a>
+    </div>
+  </section>
+
+  <section class="section-block container" aria-labelledby="explore-heading">
+    <div class="section-heading"><h2 id="explore-heading">Explore the work</h2><span>04 / SECTIONS</span></div>
+    <div class="section-links">{sections.map(([number, label, href, summary]) => <a href={href}><span>{number} / {summary}</span><strong>{label} <b class="arrow">↗</b></strong></a>)}</div>
+  </section>
+
+  <section class="section-block container" aria-labelledby="latest-heading">
+    <div class="section-heading"><h2 id="latest-heading">Latest posts</h2><span>05 / NEWEST FIRST</span></div>
+    <div class="latest-list">{latest.map((post) => <PostRow post={post} />)}</div>
+  </section>
+</BaseLayout>
