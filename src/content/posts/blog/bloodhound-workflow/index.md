@@ -2,6 +2,7 @@
 title: "SAMPLE — How I use BloodHound without getting lost"
 date: 2026-09-23
 type: tool
+sample: true
 summary: "A fictional tool-explainer sample showing the blog's editorial reading style."
 tags: ["active-directory", "tooling"]
 difficulty: easy

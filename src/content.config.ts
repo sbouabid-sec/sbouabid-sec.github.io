@@ -10,7 +10,8 @@ const posts = defineCollection({
     type: z.enum(['writeup', 'research', 'tool']),
     summary: z.string().min(1),
     tags: z.array(z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Tags must use lowercase kebab-case')).min(1),
-    difficulty: z.enum(['easy', 'medium', 'hard']),
+    difficulty: z.enum(['easy', 'medium', 'hard']).optional(),
+    sample: z.boolean().default(false),
     draft: z.boolean().default(false),
   }),
 });

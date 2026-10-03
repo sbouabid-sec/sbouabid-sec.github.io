@@ -2,6 +2,7 @@
 title: "SAMPLE — Authentication race-condition study"
 date: 2026-09-28
 type: research
+sample: true
 summary: "A fictional research case used to show an evidence-oriented article layout."
 tags: ["web", "authentication"]
 difficulty: hard

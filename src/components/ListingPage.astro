@@ -10,6 +10,7 @@ interface Props {
 }
 const { eyebrow, title, intro, posts } = Astro.props;
 const tags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
+const hasSamples = posts.some((post) => post.data.sample);
 ---
 
 <section class="listing-header container">
@@ -34,7 +35,7 @@ const tags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
   </div>
 </section>
 <section class="container listing-results" aria-label={`${eyebrow} posts`}>
-  <div class="list-caption"><span>NEWEST FIRST / SAMPLE CONTENT</span><span data-result-count>{posts.length} RESULTS</span></div>
+  <div class="list-caption"><span>NEWEST FIRST{hasSamples ? ' / SAMPLE CONTENT' : ''}</span><span data-result-count>{posts.length} RESULTS</span></div>
   <div class="post-list" data-post-list>{posts.map((post) => <PostRow post={post} />)}</div>
   <p class="empty-results" hidden data-empty>No posts match those filters.</p>
 </section>

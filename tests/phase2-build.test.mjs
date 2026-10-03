@@ -6,10 +6,10 @@ const output = new URL('../dist/', import.meta.url);
 const read = (path) => readFileSync(new URL(path, output), 'utf8');
 
 test('post pages publish their own canonical and social metadata', () => {
-  const html = read('writeups/forest/index.html');
-  assert.match(html, /<link rel="canonical" href="https:\/\/sbouabid-sec\.github\.io\/writeups\/forest\/"/);
-  assert.match(html, /<meta property="og:title" content="SAMPLE — Forest \| TODO\(owner\): NAME"/);
-  assert.match(html, /<meta property="og:description" content="A fictional retired-box walkthrough used to demonstrate the reading layout\."/);
+  const html = read('writeups/nimbus/index.html');
+  assert.match(html, /<link rel="canonical" href="https:\/\/sbouabid-sec\.github\.io\/writeups\/nimbus\/"/);
+  assert.match(html, /<meta property="og:title" content="Nimbus — HackTheBox \| TODO\(owner\): NAME"/);
+  assert.match(html, /<meta property="og:description" content="SSRF exposed LocalStack credentials, leading through SQS job execution to a privileged container and host escape\."/);
   assert.match(html, /<meta property="og:type" content="article"/);
   assert.match(html, /<meta property="og:image" content="https:\/\/sbouabid-sec\.github\.io\/og-placeholder\.png"/);
 });
@@ -26,7 +26,7 @@ test('robots and sitemap expose every public post route', () => {
   assert.match(read('sitemap.xml'), /sitemap-0\.xml/);
   assert.match(read('sitemap-index.xml'), /sitemap-0\.xml/);
   const sitemap = read('sitemap-0.xml');
-  for (const path of ['/writeups/forest/', '/research/authentication-study/', '/blog/bloodhound-workflow/']) {
+  for (const path of ['/writeups/nimbus/', '/research/authentication-study/', '/blog/bloodhound-workflow/']) {
     assert.ok(sitemap.includes(`https://sbouabid-sec.github.io${path}`), path);
   }
 });

@@ -1,6 +1,6 @@
 # Security portfolio
 
-An Astro static site for writeups, research, blog posts, and projects. The current entries are clearly marked **SAMPLE** and the personal fields are `TODO(owner)` placeholders.
+An Astro static site for writeups, research, blog posts, and projects. The Writeups section contains 15 migrated real articles. Research, Blog, and Projects still contain clearly marked **SAMPLE** entries; personal fields remain `TODO(owner)` placeholders.
 
 ## Run locally
 
@@ -41,9 +41,9 @@ difficulty: medium
 Your post starts here.
 ```
 
-For a research post, use `src/content/posts/research/my-topic/index.md` and `type: research`. For a blog post that explains or reviews a tool, use `src/content/posts/blog/my-topic/index.md` and `type: tool`. Tools you built belong in Projects. The required fields are `title`, `date`, `type`, `summary`, `tags`, and `difficulty`; difficulty must be `easy`, `medium`, or `hard`. Tags must be lowercase kebab-case. The folder name becomes the URL slug, and the `type` must match its folder.
+For a research post, use `src/content/posts/research/my-topic/index.md` and `type: research`. For a blog post that explains or reviews a tool, use `src/content/posts/blog/my-topic/index.md` and `type: tool`. Tools you built belong in Projects. The required fields are `title`, `date`, `type`, `summary`, and `tags`. Include `difficulty: easy`, `medium`, or `hard` for a machine when its source states a rating; omit it for unrated web challenges. Tags must be lowercase kebab-case. The folder name becomes the URL slug, and the `type` must match its folder.
 
-Put images in an `images/` folder beside that `index.md` and link with `![Meaningful alt text](./images/example.png)`. `draft: true` keeps an unfinished post out of listings and routes. Only publish writeups for retired HackTheBox machines and only publish findings that are cleared for disclosure. Remove or replace the clearly labeled SAMPLE entries before publishing real work.
+Put images in an `images/` folder beside that `index.md` and link with `![Meaningful alt text](./images/example.png)`. `draft: true` keeps an unfinished post out of listings and routes. Only publish writeups for retired HackTheBox machines and only publish findings that are cleared for disclosure. The clearly labeled SAMPLE research and blog posts are separate from the migrated writeups.
 
 ## Add a project
 
@@ -73,7 +73,7 @@ Every page has a canonical URL, description, and Open Graph metadata. The build 
 
 ## Owner details to supply
 
-Replace the `TODO(owner)` placeholders for the name, one-line status, bio, proof points, public email, GitHub/HackTheBox/LinkedIn URLs, public project choices and details, default Open Graph image, and final tag vocabulary. Replace SAMPLE posts with the owner's cleared, publishable work. The approved V5 design is already implemented. The light/dark choice is saved in browser local storage; a first visit always starts dark.
+Replace the `TODO(owner)` placeholders for the name, one-line status, bio, proof points, public email, GitHub/HackTheBox/LinkedIn URLs, public project choices and details, default Open Graph image, and final tag vocabulary. Replace SAMPLE research and blog posts with the owner's cleared, publishable work. The approved V5 design is already implemented. The light/dark choice is saved in browser local storage; a first visit always starts dark.
 
 ## Dependency audit
 

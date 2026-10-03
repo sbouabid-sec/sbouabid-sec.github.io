@@ -15,12 +15,12 @@ const date = post.data.date.toISOString().slice(0, 10);
   <div class="sr-only" data-pagefind-body><span data-pagefind-meta="title">{post.data.title}</span> <span>{post.data.tags.join(' ')}</span></div>
   <header class="article-header">
     <div class="container">
-      <a class="eyebrow" href={`/${section}/`}>← {sectionLabel} / SAMPLE CONTENT</a>
+      <a class="eyebrow" href={`/${section}/`}>← {sectionLabel}{post.data.sample ? ' / SAMPLE CONTENT' : ''}</a>
       <h1>{post.data.title}</h1>
       <p class="lede">{post.data.summary}</p>
       <div class="article-meta">
         <time datetime={date}>{date}</time>
-        <span class:list={['difficulty', post.data.difficulty]}>{post.data.difficulty}</span>
+        {post.data.difficulty && <span class:list={['difficulty', post.data.difficulty]}>{post.data.difficulty}</span>}
         <div class="tag-list">{post.data.tags.map((tag) => <span class="tag">{tag}</span>)}</div>
       </div>
     </div>

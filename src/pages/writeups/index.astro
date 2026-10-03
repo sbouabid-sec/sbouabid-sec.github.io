@@ -4,6 +4,6 @@ import ListingPage from '../../components/ListingPage.astro';
 import { publishedPosts } from '../../lib/content';
 const posts = (await publishedPosts()).filter((post) => post.data.type === 'writeup');
 ---
-<BaseLayout title="Writeups | TODO(owner): NAME" description="HackTheBox writeups and hands-on learning notes from TODO(owner): NAME. Current entries are clearly labeled SAMPLE.">
-  <ListingPage eyebrow="01 / ARCHIVE" title="Writeups" intro="Retired-machine walkthroughs and hands-on learning notes. SAMPLE entries are demonstrations only." posts={posts} />
+<BaseLayout title="Writeups | TODO(owner): NAME" description="HackTheBox and VulnLab writeups and hands-on learning notes from TODO(owner): NAME.">
+  <ListingPage eyebrow="01 / ARCHIVE" title="Writeups" intro="Machine walkthroughs and web challenge notes, with the attack path and technical lessons preserved." posts={posts} />
 </BaseLayout>

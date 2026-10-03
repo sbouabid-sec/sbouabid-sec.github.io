@@ -15,7 +15,7 @@ const date = post.data.date.toISOString().slice(0, 10);
   </div>
   <div class="post-row-side">
     <time datetime={date}>{date}</time>
-    <span class:list={['difficulty', post.data.difficulty]}>{post.data.difficulty}</span>
+    {post.data.difficulty && <span class:list={['difficulty', post.data.difficulty]}>{post.data.difficulty}</span>}
     <div class="tag-list">{post.data.tags.map((tag) => <span class="tag">{tag}</span>)}</div>
   </div>
 </article>
