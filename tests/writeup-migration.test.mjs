@@ -6,12 +6,14 @@ const slugs = [
   'nimbus', 'pirate', 'garfield', 'build', 'giveback', 'gavel', 'imagery',
   'soulmate', 'infection', 'active', 'cicada', 'timelapse',
   'csp-bypass-xss', 'json-csrf', 'xssi',
+  'codeparttwo', 'titanic', 'linkvortex', 'code', 'conversor', 'permx',
+  'forgotten', 'escape',
 ];
 const dist = new URL('../dist/', import.meta.url);
 const writeups = new URL('../src/content/posts/writeups/', import.meta.url);
 const readOutput = (path) => readFileSync(new URL(path, dist), 'utf8');
 
-test('the selected writeups publish 15 real routes and replace Forest', () => {
+test('the selected writeups publish 23 real routes and replace Forest', () => {
   const folders = readdirSync(writeups, { withFileTypes: true })
     .filter((entry) => entry.isDirectory() && existsSync(new URL(`${entry.name}/index.md`, writeups)))
     .map((entry) => entry.name).sort();
@@ -21,7 +23,7 @@ test('the selected writeups publish 15 real routes and replace Forest', () => {
   }
   assert.equal(existsSync(new URL('writeups/forest/index.html', dist)), false);
   const listing = readOutput('writeups/index.html');
-  assert.equal((listing.match(/class="post-row"/g) ?? []).length, 15);
+  assert.equal((listing.match(/class="post-row"/g) ?? []).length, 23);
   assert.doesNotMatch(listing, /SAMPLE CONTENT|SAMPLE entries/);
 });
 

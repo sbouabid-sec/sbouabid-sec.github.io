@@ -63,13 +63,13 @@ test('difficulty is a segmented button group with pressed state', () => {
   }
 });
 
-test('the writeups picker lists 45 usage-sorted tags and no CVE IDs', () => {
+test('the writeups picker lists 68 usage-sorted tags and no CVE IDs', () => {
   const options = pickerOptions(readOutput('writeups/index.html'));
-  // 49 unique tags in the writeups content, 4 of which look like CVE IDs.
-  assert.equal(options.length, 45);
+  // 76 unique tags in the writeups content, 8 of which look like CVE IDs.
+  assert.equal(options.length, 68);
   assert.deepEqual(options.slice(0, 2), [
+    { value: 'privilege-escalation', count: 9 },
     { value: 'active-directory', count: 5 },
-    { value: 'web-security', count: 3 },
   ]);
   for (const option of options) {
     assert.equal(isCveTag(option.value), false, option.value);
@@ -80,7 +80,7 @@ test('the writeups picker lists 45 usage-sorted tags and no CVE IDs', () => {
 
 test('CVE-ID tags stay on the posts even though the picker hides them', () => {
   const html = readOutput('writeups/index.html');
-  for (const tag of ['cve-2025-64459', 'cve-2025-32433', 'cve-2025-31161', 'cve-2024-5932']) {
+  for (const tag of ['cve-2025-64459', 'cve-2025-32433', 'cve-2025-31161', 'cve-2024-5932', 'cve-2024-28397', 'cve-2024-41817', 'cve-2023-40028', 'cve-2023-4220']) {
     assert.ok(html.includes(tag), tag);
   }
 });
