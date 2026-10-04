@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import PostRow from './PostRow.astro';
+import { humanizeTag, isCveTag } from '../lib/tags.mjs';
 
 interface Props {
   eyebrow: string;
@@ -9,8 +10,19 @@ interface Props {
   posts: CollectionEntry<'posts'>[];
 }
 const { eyebrow, title, intro, posts } = Astro.props;
-const tags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
+
+// How often each tag is used on this listing. CVE-ID tags are counted
+// nowhere here: they stay on the posts but never appear in the picker.
+const usage = new Map<string, number>();
+for (const post of posts) {
+  for (const tag of post.data.tags) usage.set(tag, (usage.get(tag) ?? 0) + 1);
+}
+// Most used first, then alphabetically.
+const pickerTags = [...usage.entries()]
+  .filter(([tag]) => !isCveTag(tag))
+  .sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0));
 const hasSamples = posts.some((post) => post.data.sample);
+const difficulties = ['', 'easy', 'medium', 'hard'] as const;
 ---
 
 <section class="listing-header container">
@@ -20,54 +32,203 @@ const hasSamples = posts.some((post) => post.data.sample);
 </section>
 <section class="filter-band" aria-label="Filter posts">
   <div class="container filters" data-filters>
-    <label>Tag
-      <select name="tag" aria-label="Filter by tag">
-        <option value="">All tags</option>
-        {tags.map((tag) => <option value={tag}>{tag}</option>)}
-      </select>
-    </label>
-    <label>Difficulty
-      <select name="difficulty" aria-label="Filter by difficulty">
-        <option value="">All difficulties</option>
-        <option value="easy">Easy</option><option value="medium">Medium</option><option value="hard">Hard</option>
-      </select>
-    </label>
+    <div class="tag-filter" data-tag-filter>
+      <button type="button" class="chip tag-trigger" data-tag-trigger aria-expanded="false" aria-controls="tag-panel">
+        <span data-tag-trigger-label>TAGS</span>
+      </button>
+      <div class="tag-panel" id="tag-panel" hidden data-tag-panel>
+        <input type="search" class="tag-search" placeholder="Search tags" aria-label="Search tags" data-tag-search />
+        <div class="tag-options" role="group" aria-label="Tags" data-tag-options>
+          {pickerTags.map(([tag, count]) => (
+            <label class="tag-option" data-tag-option={tag} data-tag-label={humanizeTag(tag)}>
+              <input type="checkbox" value={tag} data-tag-checkbox />
+              <span class="tag-check" aria-hidden="true"></span>
+              <span class="tag-option-label">{humanizeTag(tag)}</span>
+              <span class="tag-count">{count}</span>
+            </label>
+          ))}
+        </div>
+        <p class="tag-no-match" hidden data-tag-no-match>No tags match that search.</p>
+      </div>
+      <div class="tag-selected" data-tag-selected></div>
+      <button type="button" class="tag-clear" hidden data-tag-clear>Clear all</button>
+    </div>
+    <div class="difficulty-filter" role="group" aria-label="Filter by difficulty" data-difficulty>
+      {difficulties.map((value) => (
+        <button
+          type="button"
+          class="chip difficulty-button"
+          data-difficulty-value={value}
+          aria-pressed={value === '' ? 'true' : 'false'}
+        >{value === '' ? 'All' : value.charAt(0).toUpperCase() + value.slice(1)}</button>
+      ))}
+    </div>
   </div>
 </section>
 <section class="container listing-results" aria-label={`${eyebrow} posts`}>
-  <div class="list-caption"><span>NEWEST FIRST{hasSamples ? ' / SAMPLE CONTENT' : ''}</span><span data-result-count>{posts.length} RESULTS</span></div>
+  <div class="list-caption"><span>NEWEST FIRST{hasSamples ? ' / SAMPLE CONTENT' : ''}</span><span data-result-count>Showing {posts.length} of {posts.length} posts</span></div>
   <div class="post-list" data-post-list>{posts.map((post) => <PostRow post={post} />)}</div>
-  <p class="empty-results" hidden data-empty>No posts match those filters.</p>
+  <p class="empty-results" hidden data-empty>No posts match these filters. <button type="button" class="chip" data-empty-clear>Clear all</button></p>
 </section>
 
 <script>
-  const controls = document.querySelector<HTMLElement>('[data-filters]');
-  const tag = controls?.querySelector<HTMLSelectElement>('[name="tag"]');
-  const difficulty = controls?.querySelector<HTMLSelectElement>('[name="difficulty"]');
+  const root = document.querySelector<HTMLElement>('[data-filters]');
+  const tagFilter = root?.querySelector<HTMLElement>('[data-tag-filter]');
+  const trigger = tagFilter?.querySelector<HTMLButtonElement>('[data-tag-trigger]');
+  const triggerLabel = tagFilter?.querySelector<HTMLElement>('[data-tag-trigger-label]');
+  const panel = tagFilter?.querySelector<HTMLElement>('[data-tag-panel]');
+  const search = tagFilter?.querySelector<HTMLInputElement>('[data-tag-search]');
+  const optionsBox = tagFilter?.querySelector<HTMLElement>('[data-tag-options]');
+  const noMatch = tagFilter?.querySelector<HTMLElement>('[data-tag-no-match]');
+  const optionLabels = [...(optionsBox?.querySelectorAll<HTMLElement>('[data-tag-option]') ?? [])];
+  const checkboxes = [...(optionsBox?.querySelectorAll<HTMLInputElement>('input[type="checkbox"]') ?? [])];
+  const selectedBox = tagFilter?.querySelector<HTMLElement>('[data-tag-selected]');
+  const clearButton = tagFilter?.querySelector<HTMLButtonElement>('[data-tag-clear]');
+  const difficultyGroup = root?.querySelector<HTMLElement>('[data-difficulty]');
+  const difficultyButtons = [...(difficultyGroup?.querySelectorAll<HTMLButtonElement>('button') ?? [])];
   const rows = [...document.querySelectorAll<HTMLElement>('.post-row')];
   const count = document.querySelector<HTMLElement>('[data-result-count]');
   const empty = document.querySelector<HTMLElement>('[data-empty]');
+  const emptyClear = empty?.querySelector<HTMLButtonElement>('[data-empty-clear]');
+  const total = rows.length;
+  const knownTags = new Set(checkboxes.map((box) => box.value));
+  const selected = new Set<string>();
+
+  // Filters already reflected in the URL keep working across reloads and
+  // shared links. Unknown values (for example a CVE tag from an older
+  // link) are ignored because the picker cannot select them.
   const query = new URLSearchParams(location.search);
-  if (tag && [...tag.options].some((option) => option.value === query.get('tag'))) tag.value = query.get('tag') || '';
-  if (difficulty && [...difficulty.options].some((option) => option.value === query.get('difficulty'))) difficulty.value = query.get('difficulty') || '';
+  for (const tag of query.getAll('tag')) if (knownTags.has(tag)) selected.add(tag);
+  const requestedDifficulty = query.get('difficulty') ?? '';
+  let difficulty = requestedDifficulty === 'easy' || requestedDifficulty === 'medium' || requestedDifficulty === 'hard'
+    ? requestedDifficulty
+    : '';
+
+  function labelFor(tag: string): string {
+    return optionLabels.find((option) => option.dataset.tagOption === tag)?.dataset.tagLabel ?? tag;
+  }
+
+  function renderSelection() {
+    for (const box of checkboxes) box.checked = selected.has(box.value);
+    if (triggerLabel) triggerLabel.textContent = selected.size === 0 ? 'TAGS' : `TAGS · ${selected.size}`;
+    if (selectedBox) {
+      selectedBox.innerHTML = '';
+      for (const tag of selected) {
+        const chip = document.createElement('span');
+        chip.className = 'tag-chip';
+        chip.textContent = labelFor(tag);
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.className = 'tag-chip-remove';
+        remove.textContent = '×';
+        remove.setAttribute('aria-label', `Remove ${labelFor(tag)} filter`);
+        remove.addEventListener('click', () => {
+          selected.delete(tag);
+          sync();
+        });
+        chip.append(remove);
+        selectedBox.append(chip);
+      }
+    }
+    const active = selected.size > 0 || difficulty !== '';
+    if (clearButton) clearButton.hidden = !active;
+    for (const button of difficultyButtons) {
+      const on = button.dataset.difficultyValue === difficulty;
+      button.setAttribute('aria-pressed', on ? 'true' : 'false');
+    }
+  }
 
   function applyFilters() {
     let visible = 0;
     for (const row of rows) {
-      const matchesTag = !tag?.value || row.dataset.tags?.split(' ').includes(tag.value);
-      const matchesDifficulty = !difficulty?.value || row.dataset.difficulty === difficulty.value;
-      row.hidden = !(matchesTag && matchesDifficulty);
+      const tags = row.dataset.tags?.split(' ') ?? [];
+      const matchesTags = [...selected].every((tag) => tags.includes(tag));
+      const matchesDifficulty = difficulty === '' || row.dataset.difficulty === difficulty;
+      row.hidden = !(matchesTags && matchesDifficulty);
       if (!row.hidden) visible++;
     }
-    if (count) count.textContent = `${visible} ${visible === 1 ? 'RESULT' : 'RESULTS'}`;
+    if (count) count.textContent = `Showing ${visible} of ${total} posts`;
     if (empty) empty.hidden = visible !== 0;
   }
-  applyFilters();
-  for (const select of [tag, difficulty]) select?.addEventListener('change', () => {
+
+  function sync() {
     const params = new URLSearchParams();
-    if (tag?.value) params.set('tag', tag.value);
-    if (difficulty?.value) params.set('difficulty', difficulty.value);
+    for (const tag of selected) params.append('tag', tag);
+    if (difficulty !== '') params.set('difficulty', difficulty);
     history.replaceState(null, '', `${location.pathname}${params.size ? `?${params}` : ''}`);
+    renderSelection();
     applyFilters();
+  }
+
+  function setPanel(open: boolean) {
+    if (!panel || !trigger) return;
+    panel.hidden = !open;
+    trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) search?.focus();
+  }
+
+  trigger?.addEventListener('click', () => setPanel(panel?.hidden ?? false));
+  document.addEventListener('pointerdown', (event) => {
+    if (panel && !panel.hidden && !tagFilter?.contains(event.target as Node)) setPanel(false);
   });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && panel && !panel.hidden) {
+      setPanel(false);
+      trigger?.focus();
+    }
+  });
+
+  // The checkboxes stay native so Tab works on its own; arrow keys move
+  // focus between the visible options, like a listbox without the ARIA role.
+  optionsBox?.addEventListener('keydown', (event) => {
+    if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp' && event.key !== 'Home' && event.key !== 'End') return;
+    const visible = checkboxes.filter((box) => box.closest<HTMLElement>('[data-tag-option]')?.hidden !== true);
+    const current = visible.indexOf(document.activeElement as HTMLInputElement);
+    if (current === -1) return;
+    event.preventDefault();
+    const next = event.key === 'ArrowDown'
+      ? visible[(current + 1) % visible.length]
+      : event.key === 'ArrowUp'
+        ? visible[(current - 1 + visible.length) % visible.length]
+        : event.key === 'Home' ? visible[0] : visible[visible.length - 1];
+    next?.focus();
+  });
+
+  search?.addEventListener('input', () => {
+    const needle = (search.value ?? '').trim().toLowerCase();
+    let shown = 0;
+    for (const option of optionLabels) {
+      const haystack = `${option.dataset.tagLabel ?? ''} ${option.dataset.tagOption ?? ''}`.toLowerCase();
+      const show = needle === '' || haystack.includes(needle);
+      option.hidden = !show;
+      if (show) shown++;
+    }
+    if (noMatch) noMatch.hidden = shown !== 0;
+  });
+
+  for (const box of checkboxes) {
+    box.addEventListener('change', () => {
+      if (box.checked) selected.add(box.value);
+      else selected.delete(box.value);
+      sync();
+    });
+  }
+
+  for (const button of difficultyButtons) {
+    button.addEventListener('click', () => {
+      difficulty = button.dataset.difficultyValue ?? '';
+      sync();
+    });
+  }
+
+  function clearAll() {
+    selected.clear();
+    difficulty = '';
+    sync();
+  }
+  clearButton?.addEventListener('click', clearAll);
+  emptyClear?.addEventListener('click', clearAll);
+
+  renderSelection();
+  applyFilters();
 </script>

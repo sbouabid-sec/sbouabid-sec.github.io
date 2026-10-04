@@ -3,7 +3,7 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 const projects = await getCollection('projects');
 ---
-<BaseLayout title="Projects | TODO(owner): NAME" description="Projects built and maintained by TODO(owner): NAME. Current cards are SAMPLE placeholders pending public-project approval." tone="editorial">
+<BaseLayout title="Projects | Soulaimane Bouabid" description="Projects built and maintained by Soulaimane Bouabid. Current cards are SAMPLE placeholders pending public-project approval." tone="editorial">
   <header class="page-heading container"><p class="eyebrow">04 / BUILT WORK</p><h1>Projects</h1><p class="lede">SAMPLE placeholders. TODO(owner): Confirm which projects can be public before publishing descriptions or repository links.</p></header>
   <section class="container projects-list" aria-label="Projects">
     {projects.map((project, index) => <article class="project-card">

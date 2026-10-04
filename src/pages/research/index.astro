@@ -4,6 +4,6 @@ import ListingPage from '../../components/ListingPage.astro';
 import { publishedPosts } from '../../lib/content';
 const posts = (await publishedPosts()).filter((post) => post.data.type === 'research');
 ---
-<BaseLayout title="Research | TODO(owner): NAME" description="Security research and investigation reports from TODO(owner): NAME. Current entries are clearly labeled SAMPLE.">
+<BaseLayout title="Research | Soulaimane Bouabid" description="Security research and investigation reports from Soulaimane Bouabid. Current entries are clearly labeled SAMPLE.">
   <ListingPage eyebrow="02 / ARCHIVE" title="Research" intro="Security research, investigations, and findings. SAMPLE entries are demonstrations only." posts={posts} />
 </BaseLayout>

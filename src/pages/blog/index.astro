@@ -4,6 +4,6 @@ import ListingPage from '../../components/ListingPage.astro';
 import { publishedPosts } from '../../lib/content';
 const posts = (await publishedPosts()).filter((post) => post.data.type === 'tool');
 ---
-<BaseLayout title="Blog | TODO(owner): NAME" description="Blog posts about security tools, methods, and ideas from TODO(owner): NAME. Current entries are clearly labeled SAMPLE." tone="editorial">
+<BaseLayout title="Blog | Soulaimane Bouabid" description="Blog posts about security tools, methods, and ideas from Soulaimane Bouabid. Current entries are clearly labeled SAMPLE." tone="editorial">
   <ListingPage eyebrow="03 / ARCHIVE" title="Blog" intro="Notes on tools, methods, and ideas. SAMPLE entries are demonstrations only." posts={posts} />
 </BaseLayout>

@@ -2,6 +2,7 @@
 import { render, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { sectionForType } from '../lib/posts.mjs';
+import { displayTag } from '../lib/tags.mjs';
 
 interface Props { post: CollectionEntry<'posts'>; }
 const { post } = Astro.props;
@@ -11,7 +12,7 @@ const sectionLabel = post.data.type === 'tool' ? 'BLOG' : post.data.type.toUpper
 const date = post.data.date.toISOString().slice(0, 10);
 ---
 
-<BaseLayout title={`${post.data.title} | TODO(owner): NAME`} description={post.data.summary} pageType="article" tone={post.data.type === 'tool' ? 'editorial' : 'dark'}>
+<BaseLayout title={`${post.data.title} | Soulaimane Bouabid`} description={post.data.summary} pageType="article" tone={post.data.type === 'tool' ? 'editorial' : 'dark'}>
   <div class="sr-only" data-pagefind-body><span data-pagefind-meta="title">{post.data.title}</span> <span>{post.data.tags.join(' ')}</span></div>
   <header class="article-header">
     <div class="container">
@@ -21,7 +22,7 @@ const date = post.data.date.toISOString().slice(0, 10);
       <div class="article-meta">
         <time datetime={date}>{date}</time>
         {post.data.difficulty && <span class:list={['difficulty', post.data.difficulty]}>{post.data.difficulty}</span>}
-        <div class="tag-list">{post.data.tags.map((tag) => <span class="tag">{tag}</span>)}</div>
+        <div class="tag-list">{post.data.tags.map((tag) => <span class="tag">{displayTag(tag)}</span>)}</div>
       </div>
     </div>
   </header>
@@ -41,30 +42,41 @@ const date = post.data.date.toISOString().slice(0, 10);
     <p class="lightbox-caption"></p>
   </dialog>
   <script>
-    // Markdown code and images are enhanced after Astro renders them.
+    import { codeBlockPresentation } from '../lib/code-blocks.mjs';
+
+    // Astro supplies data-language on Shiki blocks, so every Markdown fence gets a panel automatically.
     for (const pre of document.querySelectorAll<HTMLPreElement>('.prose pre')) {
+      const { kind, label } = codeBlockPresentation(pre.dataset.language);
       const frame = document.createElement('div');
-      frame.className = 'code-frame';
-      pre.parentNode?.insertBefore(frame, pre);
-      frame.append(pre);
+      frame.className = `code-frame code-frame--${kind}`;
+      const header = document.createElement('div');
+      header.className = 'code-header';
+      const language = document.createElement('span');
+      language.className = 'code-language';
+      language.textContent = label;
       const button = document.createElement('button');
       button.type = 'button';
-      button.className = 'copy-code chip';
+      button.className = 'copy-code';
       button.textContent = 'COPY';
-      button.setAttribute('aria-label', 'Copy code to clipboard');
-      frame.append(button);
+      button.setAttribute('aria-label', `Copy ${label} block to clipboard`);
+      header.append(language, button);
+      pre.parentNode?.insertBefore(frame, pre);
+      frame.append(header, pre);
       button.addEventListener('click', async () => {
         try {
           await navigator.clipboard.writeText(pre.querySelector('code')?.innerText ?? pre.innerText);
           button.textContent = 'COPIED';
-          button.setAttribute('aria-label', 'Code copied to clipboard');
+          button.dataset.copyState = 'copied';
+          button.setAttribute('aria-label', `${label} block copied to clipboard`);
           window.setTimeout(() => {
             button.textContent = 'COPY';
-            button.setAttribute('aria-label', 'Copy code to clipboard');
+            delete button.dataset.copyState;
+            button.setAttribute('aria-label', `Copy ${label} block to clipboard`);
           }, 2200);
         } catch {
           button.textContent = 'COPY FAILED';
-          button.setAttribute('aria-label', 'Could not copy code');
+          button.dataset.copyState = 'failed';
+          button.setAttribute('aria-label', `Could not copy ${label} block`);
         }
       });
     }

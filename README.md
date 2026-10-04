@@ -73,7 +73,7 @@ Every page has a canonical URL, description, and Open Graph metadata. The build 
 
 ## Owner details to supply
 
-Replace the `TODO(owner)` placeholders for the name, one-line status, bio, proof points, public email, GitHub/HackTheBox/LinkedIn URLs, public project choices and details, default Open Graph image, and final tag vocabulary. Replace SAMPLE research and blog posts with the owner's cleared, publishable work. The approved V5 design is already implemented. The light/dark choice is saved in browser local storage; a first visit always starts dark.
+Replace the `TODO(owner)` placeholders for the one-line status, bio, proof points, public project choices and details, default Open Graph image, and final tag vocabulary. Replace SAMPLE research and blog posts with the owner's cleared, publishable work. The approved V5 design is already implemented. The light/dark choice is saved in browser local storage; a first visit always starts dark.
 
 ## Dependency audit
 

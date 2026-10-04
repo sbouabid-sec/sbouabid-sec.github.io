@@ -8,7 +8,7 @@ const read = (path) => readFileSync(new URL(path, output), 'utf8');
 test('post pages publish their own canonical and social metadata', () => {
   const html = read('writeups/nimbus/index.html');
   assert.match(html, /<link rel="canonical" href="https:\/\/sbouabid-sec\.github\.io\/writeups\/nimbus\/"/);
-  assert.match(html, /<meta property="og:title" content="Nimbus — HackTheBox \| TODO\(owner\): NAME"/);
+  assert.match(html, /<meta property="og:title" content="Nimbus — HackTheBox \| Soulaimane Bouabid"/);
   assert.match(html, /<meta property="og:description" content="SSRF exposed LocalStack credentials, leading through SQS job execution to a privileged container and host escape\."/);
   assert.match(html, /<meta property="og:type" content="article"/);
   assert.match(html, /<meta property="og:image" content="https:\/\/sbouabid-sec\.github\.io\/og-placeholder\.png"/);

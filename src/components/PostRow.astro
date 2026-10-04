@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import { postUrl } from '../lib/posts.mjs';
+import { displayTag } from '../lib/tags.mjs';
 
 interface Props { post: CollectionEntry<'posts'>; }
 const { post } = Astro.props;
@@ -16,6 +17,6 @@ const date = post.data.date.toISOString().slice(0, 10);
   <div class="post-row-side">
     <time datetime={date}>{date}</time>
     {post.data.difficulty && <span class:list={['difficulty', post.data.difficulty]}>{post.data.difficulty}</span>}
-    <div class="tag-list">{post.data.tags.map((tag) => <span class="tag">{tag}</span>)}</div>
+    <div class="tag-list">{post.data.tags.map((tag) => <span class="tag">{displayTag(tag)}</span>)}</div>
   </div>
 </article>

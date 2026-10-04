@@ -8,12 +8,12 @@ const links = [
 
 <header class="site-header">
   <div class="nav-inner">
-    <a class="brand" href="/" aria-label="Home"><strong>S/</strong><span>TODO(owner): NAME</span></a>
+    <a class="brand" href="/" aria-label="Home"><strong>S/</strong><span>Soulaimane Bouabid</span></a>
     <div class="nav-actions">
       <button class="mobile-menu-button chip" type="button" aria-controls="primary-nav" aria-expanded="false">MENU</button>
       <nav id="primary-nav" class="primary-nav" aria-label="Primary">
         {links.map(([label, href]) => <a href={href} aria-current={current === href || (href !== '/' && current.startsWith(href)) ? 'page' : undefined}>{label}</a>)}
-        <a class="contact-nav" href="mailto:" aria-label="Contact by email; TODO(owner): public email address">Contact</a>
+        <a class="contact-nav" href="mailto:soulaimane.bouabid.sec@gmail.com" aria-label="Contact by email">Contact</a>
       </nav>
       <button class="search-toggle chip" type="button" aria-haspopup="dialog">SEARCH</button>
       <button class="theme-toggle chip" type="button" aria-label="Switch to light theme">DARK</button>

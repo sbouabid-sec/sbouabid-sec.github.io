@@ -2,7 +2,9 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PostRow from '../components/PostRow.astro';
 import { publishedPosts } from '../lib/content';
-const latest = (await publishedPosts()).slice(0, 5);
+const published = await publishedPosts();
+const latest = published.slice(0, 5);
+const writeupCount = published.filter((post) => post.data.type === 'writeup' && !post.data.sample).length;
 const sections = [
   ['01', 'Writeups', '/writeups/', 'Walkthroughs and learning notes'],
   ['02', 'Research', '/research/', 'Security investigations and reports'],
@@ -11,25 +13,25 @@ const sections = [
 ];
 ---
 
-<BaseLayout title="TODO(owner): NAME — Security Portfolio" description="Portfolio of TODO(owner): NAME, a student and junior penetration tester. Explore writeups, research, blog posts, and projects.">
+<BaseLayout title="Soulaimane Bouabid — Security Portfolio" description="Portfolio of Soulaimane Bouabid, a penetration testing intern. Explore writeups, research, blog posts, and projects.">
   <section class="hero container">
     <div>
       <p class="eyebrow">PORTFOLIO / OFFENSIVE SECURITY</p>
-      <h1>TODO(owner):<br /><span class="accent">NAME.</span></h1>
-      <p class="role">Student / Junior penetration tester</p>
-      <p class="status">TODO(owner): Add a one-line current status in your own words.</p>
+      <h1>Soulaimane<br /><span class="accent">Bouabid.</span></h1>
+      <p class="role">Penetration testing intern</p>
+      <p class="status">Preparing for CRTP and writing up HackTheBox machines.</p>
     </div>
     <div class="hero-aside">
-      <span class="eyebrow">THE 30-SECOND SCAN</span>
-      <p>Writeups. Research. Tools. A place to show the work behind the learning.</p>
+      <span class="eyebrow">WHAT'S HERE</span>
+      <p>{writeupCount} {writeupCount === 1 ? 'writeup' : 'writeups'} across HackTheBox, VulnLab, and web security.</p>
     </div>
   </section>
 
   <section class="section-block container" aria-labelledby="about-heading">
     <div class="section-heading"><h2 id="about-heading">About</h2><span>01 / INTRODUCTION</span></div>
     <div class="about-grid">
-      <p>TODO(owner): Who are you, and what do you do?</p>
-      <p class="about-notes">TODO(owner): Describe what you do in life and what you have found. Keep this short and factual.</p>
+      <p>I'm Soulaimane, a penetration testing intern focused on Active Directory and web application security.</p>
+      <p class="about-notes">I write up what I break, end to end: the path, the commands, and why it worked.</p>
     </div>
   </section>
 
@@ -37,9 +39,11 @@ const sections = [
     <div class="container">
       <div class="section-heading"><h2 id="proof-heading">Proof points</h2><span>02 / VERIFIED FACTS</span></div>
       <div class="proof-grid">
-        <div class="proof-item"><span class="eyebrow">HACKTHEBOX</span><strong>TODO(owner): rank</strong><p>Provide your current, verifiable rank.</p></div>
-        <div class="proof-item"><span class="eyebrow">CERTIFICATION</span><strong>TODO(owner): status</strong><p>Provide a certification and its actual status.</p></div>
-        <div class="proof-item"><span class="eyebrow">FINDINGS</span><strong>TODO(owner): result</strong><p>Provide a public CVE or bounty result, if any.</p></div>
+        <!-- Update the machine count and date by hand when it changes. -->
+        <div class="proof-item"><span class="eyebrow">HACKTHEBOX</span><strong>Pro Hacker</strong><p>54 machines owned (Oct 2026)</p></div>
+        <div class="proof-item"><span class="eyebrow">EDUCATION</span><strong>1337 Coding School</strong><p>Part of the 42 Network</p></div>
+        <!-- Findings reference for a future Findings list: GHSA-2j8v-xx77-v45j, GHSA-mrg5-rhfq-9wvf, GHSA-39rr-47j5-8qfv, CVE-2026-5038. Two more CVEs are pending a number. Update the count and the text by hand when one is published. -->
+        <div class="proof-item"><span class="eyebrow">FINDINGS</span><strong>4 published advisories</strong><p>3 GHSA, 1 CVE · 2 more CVEs pending</p></div>
       </div>
     </div>
   </section>
@@ -47,10 +51,10 @@ const sections = [
   <section class="section-block container" aria-labelledby="links-heading">
     <div class="section-heading"><h2 id="links-heading">Find me</h2><span>03 / LINKS</span></div>
     <div class="link-grid">
-      <a href="#links-heading" aria-label="TODO(owner): GitHub profile URL"><strong><i class="link-icon" aria-hidden="true">&#123;&#125;</i> GitHub</strong><span>TODO(owner): URL <b class="arrow">↗</b></span></a>
-      <a href="#links-heading" aria-label="TODO(owner): HackTheBox profile URL"><strong><i class="link-icon" aria-hidden="true">⬡</i> HackTheBox</strong><span>TODO(owner): URL <b class="arrow">↗</b></span></a>
-      <a href="#links-heading" aria-label="TODO(owner): LinkedIn profile URL"><strong><i class="link-icon" aria-hidden="true">in</i> LinkedIn</strong><span>TODO(owner): URL <b class="arrow">↗</b></span></a>
-      <a href="mailto:" aria-label="Contact me by email; TODO(owner): public email address"><strong><i class="link-icon" aria-hidden="true">@</i> Contact me</strong><span>TODO(owner): email <b class="arrow">↗</b></span></a>
+      <a href="https://github.com/sbouabid-sec" target="_blank" rel="noopener noreferrer" aria-label="GitHub profile, sbouabid-sec (opens in a new tab)"><strong><i class="link-icon" aria-hidden="true">&#123;&#125;</i> GitHub</strong><span>github.com/sbouabid-sec <b class="arrow">↗</b></span></a>
+      <a href="https://app.hackthebox.com/users/2737090" target="_blank" rel="noopener noreferrer" aria-label="HackTheBox profile, 0xAlexx (opens in a new tab)"><strong><i class="link-icon" aria-hidden="true">⬡</i> HackTheBox</strong><span>0xAlexx <b class="arrow">↗</b></span></a>
+      <a href="https://www.linkedin.com/in/sbouabid" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn profile, sbouabid (opens in a new tab)"><strong><i class="link-icon" aria-hidden="true">in</i> LinkedIn</strong><span>linkedin.com/in/sbouabid <b class="arrow">↗</b></span></a>
+      <a href="mailto:soulaimane.bouabid.sec@gmail.com" aria-label="Contact me by email at soulaimane.bouabid.sec@gmail.com"><strong><i class="link-icon" aria-hidden="true">@</i> Contact me</strong><span>soulaimane.bouabid.sec@gmail.com <b class="arrow">↗</b></span></a>
     </div>
   </section>
 
